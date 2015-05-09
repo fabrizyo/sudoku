@@ -1,4 +1,4 @@
-# sudoku-generator
+# Sudoku Generator
 It's a generator of full compiled Sudokus.
 Examples:
 
