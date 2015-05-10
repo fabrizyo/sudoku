@@ -1,77 +1,59 @@
 from itertools import permutations
 from copy import copy
 from random import shuffle
+from random import choice
 
-def get_all_sudokus(n):
-	curr=[[None]*n for i in range(n)]
-	return get_suds(n,curr,0)
+def get_nums():
+	return [i for i in range(1,9+1)]
 
-def get_random_sudoku(n):
-	curr=[[None]*n for i in range(n)]
-	return get_suds(n,curr,0,True)[0]
+'''
+	return a matrix 9x9 Sudoku
 
-def get_permutations(l,is_random):
-	if is_random:
-		l=l[:]
-		shuffle(l)
-	return permutations(l)
+	remove:
+		 delete randomly remove numbers (set to None) from matrix
+'''
+def get_random_sudoku(remove=0):
+	can_rows={i:set(get_nums()) for i in range(9)}
+	can_cols={i:set(get_nums()) for i in range(9)}
+	can_squa={i:set(get_nums()) for i in range(9)}
+	curr=[[None]*9 for i in range(9)]
+	res=get_random(curr,can_rows,can_cols,can_squa,0)
+	choices=[i for i in range(9*9)]
+	for i in range(remove):
+		index=choice(choices)
+		choices.remove(index)
+		curr[index//9][index%9]=None
+	return curr
 
-def get_suds(n,curr,index,is_random=False):
-	if index==n:
-		return [copy(curr)]
 
-	res=[]
-	#vertical
-	poss_v=set([i for i in range(1,n+1)])
-	if index!=0:
-		poss_v-=set([curr[row][index] for row in range(index)])
-	poss_v=sorted(list(poss_v))
+def get_random(curr,can_rows,can_cols,can_squa,index):
+	if index==9*9:
+		return copy(curr)
 
-	perms_v=get_permutations(poss_v,is_random)
-	for perm_v in perms_v:
+	row=index//9
+	col=index%9
+	squ=(col//3)+(row-row%3)
 
-		if index!=0:
-			found=True
-			for row in range(index,n):
-				if perm_v[row-index] in curr[row][:index]:
-					found=False
-					break
-			if not found:
-				continue
+	can=set(get_nums())
+	can&=can_rows[row]
+	can&=can_cols[col]
+	can&=can_squa[squ]
 
-		#found
-		#place vertical
-		for i in range(index,n):
-			curr[i][index]=perm_v[i-index]
+	can=list(can)
+	shuffle(can) #random
+	for num in can:
+		curr[row][col]=num
+		can_rows[row].remove(num)
+		can_cols[col].remove(num)
+		can_squa[squ].remove(num)
 
-		#check horizontal
-		poss_h=set([i for i in range(1,n+1)])
-		poss_h-=set(curr[index][:index+1])
-		poss_h=sorted(list(poss_h))
+		res=get_random(curr,can_rows,can_cols,can_squa,index+1)
+		if res is not None:
+			return res
 
-		perms_h=get_permutations(poss_h,is_random)
-		for perm_h in perms_h:
-
-			if index!=0:
-				found=True
-				for col in range(index+1,n):
-					for row in range(index):
-						if perm_h[col-(index+1)]==curr[row][col]:
-							found=False
-							break
-					if not found:
-						break
-				if not found:
-					continue
-
-			#found
-			#place horizontal
-			for i in range(index+1,n):
-				curr[index][i]=perm_h[i-(index+1)]
-
-			res.extend(get_suds(n,curr,index+1,is_random))
-			if len(res)!=0 and is_random:
-				return res
-	return res
+		can_rows[row].add(num)
+		can_cols[col].add(num)
+		can_squa[squ].add(num)
+	return None
 
 
