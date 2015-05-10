@@ -1,8 +1,8 @@
 from unittest import TestCase
 import unittest
-from sudoku_generator import get_random_sudoku
+from sudoku import get_random_sudoku,solve_sudoku
 
-class TestSudokuGenerator(TestCase):
+class TestSudoku(TestCase):
 
 	def test_get_random_sudoku(self):
 		sud=get_random_sudoku()
@@ -10,7 +10,8 @@ class TestSudokuGenerator(TestCase):
 		print("Random:")
 		self.print_sud(sud)
 		print()
-		remove=10
+
+		remove=20
 		sud=get_random_sudoku(remove)
 		count=0
 		for row in range(9):
@@ -19,6 +20,14 @@ class TestSudokuGenerator(TestCase):
 		self.assertEqual(remove,count)
 		print("Random remove")
 		self.print_sud(sud)
+		print()
+
+		solved=solve_sudoku(sud)
+		self.check(solved)
+		print("Random remove solved")
+		self.print_sud(sud)
+		print()
+
 
 	def print_sud(self,sud):
 		for row in sud:
