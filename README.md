@@ -1,5 +1,5 @@
-# Sudoku Generator
-It's a solver and generator of full or partial compiled Sudokus.
+# Sudoku
+It's a solver and a generator of full or partial compiled Sudokus.
 Examples:
 ```
 from sudoku import get_random_sudoku,solve_sudoku
